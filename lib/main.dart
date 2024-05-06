@@ -1,77 +1,72 @@
 import 'package:flutter/material.dart';
 
-//chama a função principal
+
 void main() {
   runApp(HamburgueriaApp());
 }
 
 
 class HamburgueriaApp extends StatelessWidget {
-  //retorna a interface (obrigatório em qualquer código flutter)
   @override
   Widget build(BuildContext context) {
-    //define a estrutura básica do aplicativo
     return MaterialApp(
       title: 'Hamburguerias',
-      //página principal
       home: HamburgueriaList(),
     );
   }
 }
 
-//definindo uma lista de objetos do tipo Hamburgueria
+
 class HamburgueriaList extends StatelessWidget {
-  final List<Hamburgueria> hamburguerias = [
-    Hamburgueria(name: 'Burger King', location: 'Av. Nª Sra. de Nazaré, 759 - Nazaré'),
-    Hamburgueria(name: 'McDonald\'s', location: 'R. Antônio Barreto, 166 - Umarizal'),
-    Hamburgueria(name: 'Uata?!', location: 'R. Antônio Barreto, 287 - Umarizal'),
-    Hamburgueria(name: 'Porpino Burger', location: 'R. Cônego Jerônimo Pimentel, 242 - Umarizal'),
-    Hamburgueria(name: 'Geek Burger', location: 'R. João Balbi, 1291 - Nazaré'),
-    Hamburgueria(name: 'Bob\'s', location: 'Av. Duque de Caxias, 608 - Marco'),
-    Hamburgueria(name: 'Shake Burger', location: 'Av. Cmte. Brás de Aguiar, 312 - Nazaré'),
-    Hamburgueria(name: 'Fight Burger', location: 'Travessa Angustura, 2369 - Pedreira'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
-    Hamburgueria(name: 'xxxxxxxxxx', location: 'xxxxxxxxxx'),
+  final List<Map<String, dynamic>> hamburguerias = [
+    {"name": 'Burger King', "price": "\$\$\$", "rating": 4},
+    {"name": 'McDonald\'s', "price": "\$\$\$", "rating": 4},
+    {"name": 'Uata?!', "price": "\$\$", "rating": 3},
+    {"name": 'Porpino Burger', "price": "\$\$\$\$\$", "rating": 1},
+    {"name": 'Geek Burger', "price": "\$\$\$", "rating": 3},
+    {"name": 'Bob\'s', "price": "\$\$\$", "rating": 5},
+    {"name": 'Shake Burger', "price": "\$\$\$\$", "rating": 1},
+    {"name": 'Fight Burger', "price": "\$\$", "rating": 2},
+    {"name": 'Quital Burger', "price": "\$\$", "rating": 3},
+    {"name": 'Jack Garage', "price": "\$\$", "rating": 5},
+    {"name": 'Jimmy Lanches', "price": "\$\$\$", "rating": 2},
+    {"name": 'Park Burg', "price": "\$\$\$\$", "rating": 4},
+    {"name": 'Roger Lanches', "price": "\$\$", "rating": 4},
+    {"name": 'BurguerMan', "price": "\$\$\$", "rating": 3},
+    {"name": 'Batistão Sucos', "price": "\$\$", "rating": 2},
   ];
 
-  //interface do usuário da lista de hamburguerias
+
   @override
   Widget build(BuildContext context) {
-    //Scaffold = layout básico do material design
     return Scaffold(
       appBar: AppBar(
         title: Text('Hamburguerias'),
       ),
-      body: ListView.builder(
-        itemCount: hamburguerias.length,
-        itemBuilder: (context, index) {
+      body: ListView(
+        children: hamburguerias.map((hamburgueria) {
+          final String name = hamburgueria['name']!;
+          final int rating = hamburgueria['rating']!;
+          final String price = hamburgueria['price']!;
+
+
           return ListTile(
-            title: Text(hamburguerias[index].name),
-            subtitle: Text(hamburguerias[index].location),
+            title: Row(
+              children: [
+                Text(name),
+                SizedBox(width: 8),
+                Icon(Icons.star, color: Colors.yellow),
+                SizedBox(width: 4),
+                Text(rating.toString()),
+              ],
+            ),
+
+
+            subtitle: Text(price),
             leading: Icon(Icons.fastfood),
-            
           );
-        },
+        }).toList(),
       ),
     );
   }
 }
-
-//aqui usa o construtor hamburgueria, pra inicializar os atributos quando for criado um objeto novo
-class Hamburgueria {
-  final String name;
-  final String location;
-
-
-  Hamburgueria({required this.name, required this.location});
-}
-
-
-
