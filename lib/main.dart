@@ -1,18 +1,60 @@
-
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:trabalho_hamburguerias/login_page.dart';
-import 'package:trabalho_hamburguerias/hamburgueria_list.dart';
+import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
-  runApp(HamburgueriaApp());
+import 'hamburgueria_list.dart';
+
+
+
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
 }
 
-class HamburgueriaApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hamburguerias',
-      home: HamburgueriaList(), // Inicia na tela da lista de hamburguerias
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HamburgueriaList(), 
     );
   }
 }
+
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        
+        if (!snapshot.hasData) {
+          debugPrint("n logado");
+          return HamburgueriaList();
+        }
+
+        debugPrint("logado");
+        
+        return LoginPage();
+      },
+    );
+    
+  }
+  
+}
+
+
