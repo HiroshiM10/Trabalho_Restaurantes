@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trabalho_hamburguerias/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class HamburgueriaList extends StatelessWidget {
   final List<Map<String, dynamic>> hamburguerias = [
@@ -27,11 +29,17 @@ class HamburgueriaList extends StatelessWidget {
         title: Text('Hamburguerias'),
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
+            onPressed: () async {
+              try {
+                await FirebaseAuth.instance.signOut();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              } catch (e) {
+             
+                debugPrint('Error: $e');
+              }
             },
             icon: Icon(Icons.login),
           ),
