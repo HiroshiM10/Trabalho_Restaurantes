@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:trabalho_hamburguerias/login_page.dart';
-import 'package:trabalho_hamburguerias/details_page.dart';
+import 'package:trabalho_casseb/login_page.dart';
+import 'package:trabalho_casseb/details_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -36,7 +36,7 @@ class _HamburgueriaListState extends State<HamburgueriaList> {
   TextEditingController enderecoController = TextEditingController();
   TextEditingController contatoController = TextEditingController();
 
-  void _addHamburgueria() {
+ void _addHamburgueria() {
     String name = nameController.text;
     String preco = precoController.text;
     int rating = int.tryParse(ratingController.text) ?? 0;
@@ -50,8 +50,12 @@ class _HamburgueriaListState extends State<HamburgueriaList> {
         descricao.isNotEmpty &&
         endereco.isNotEmpty &&
         contato.isNotEmpty) {
+      // Adicione a propriedade 'id' ao adicionar uma nova hamburgueria
+      String id = _firestore.collection('hamburguerias').doc().id;
+      
       setState(() {
         hamburguerias.add({
+          "id": id,
           "name": name,
           "preco": preco,
           "rating": rating,
@@ -61,7 +65,7 @@ class _HamburgueriaListState extends State<HamburgueriaList> {
         });
       });
 
-      _firestore.collection('hamburguerias').add({
+      _firestore.collection('hamburguerias').doc(id).set({
         'name': name,
         'preco': preco,
         'rating': rating,
@@ -152,42 +156,46 @@ class _HamburgueriaListState extends State<HamburgueriaList> {
   }
 
 void _deleteHamburgueria(String docId, int index) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Excluir Hamburgueria"),
-        content: Text("Tem certeza de que deseja excluir esta hamburgueria?"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              try {
-                // Remove a hamburgueria do Firestore
-                await FirebaseFirestore.instance.collection('hamburguerias').doc(docId).delete();
-
-                // Remove a hamburgueria localmente
-                setState(() {
-                  hamburguerias.removeAt(index);
-                });
-
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Excluir Hamburgueria"),
+          content: Text("Tem certeza de que deseja excluir esta hamburgueria?"),
+          actions: [
+            TextButton(
+              onPressed: () {
                 Navigator.of(context).pop();
-              } catch (e) {
-                print('Erro ao excluir hamburgueria: $e');
-              }
-            },
-            child: Text('Confirmar'),
-          ),
-        ],
-      );
-    },
-  );
-}
+              },
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  // Remove a hamburgueria do Firestore
+                  await _firestore.collection('hamburguerias').doc(docId).delete();
+
+                  // Remove a hamburgueria localmente
+                  setState(() {
+                    hamburguerias.removeAt(index);
+                  });
+
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  print('Erro ao excluir hamburgueria: $e');
+                }
+              },
+              child: Text('Confirmar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
 
 
 void _showEditHamburgueriaDialog(int index) {
@@ -267,12 +275,15 @@ void _showEditHamburgueriaDialog(int index) {
   }
 }
 
-
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Hamburguerias'),
+        leading: IconButton(
+          icon: Icon(Icons.add),
+          onPressed: _showAddHamburgueriaDialog,
+        ),
         actions: [
           IconButton(
             onPressed: () async {
@@ -289,10 +300,6 @@ void _showEditHamburgueriaDialog(int index) {
             icon: Icon(Icons.login),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddHamburgueriaDialog,
-        child: Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: hamburguerias.length,
@@ -312,15 +319,17 @@ void _showEditHamburgueriaDialog(int index) {
               child: Icon(Icons.delete, color: Colors.white),
             ),
             onDismissed: (direction) {
-              _deleteHamburgueria(index);
+              _deleteHamburgueria(hamburgueria['id'], index);
             },
             child: ListTile(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        DetailsPage(hamburgueria: hamburgueria),
+                    builder: (context) => DetailsPage(
+                      hamburgueria: hamburgueria,
+                      onDelete: () => _deleteHamburgueria(hamburgueria['id'], index),
+                    ),
                   ),
                 );
               },
